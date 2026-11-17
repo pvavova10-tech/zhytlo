@@ -247,8 +247,8 @@ h2.rv>span{display:inline-block;transform:translateY(108%);transition:transform 
 
 /* View Transitions: forward = new slide opens from the right edge, old steps back; back = quick crossfade */
 html.vt .slide{transition:none!important}
-::view-transition-old(root){animation:vt-out .7s cubic-bezier(.77,0,.175,1) both}
-::view-transition-new(root){animation:vt-in .7s cubic-bezier(.77,0,.175,1) both}
+::view-transition-old(root){animation:vt-fade-out .4s cubic-bezier(.23,1,.32,1) both}
+::view-transition-new(root){animation:vt-fade-in .4s cubic-bezier(.23,1,.32,1) both}
 @keyframes vt-out{to{transform:translateX(-5%) scale(.96);opacity:.25}}
 @keyframes vt-in{from{clip-path:inset(0 0 0 100%)}to{clip-path:inset(0 0 0 0)}}
 html[data-dir=back]::view-transition-old(root){animation:vt-fade-out .28s cubic-bezier(.23,1,.32,1) both}
@@ -260,6 +260,19 @@ html[data-pair] .slide.on .vt-sb{view-transition-name:sb}
 .slide.on .ph.a.vt-sb,.slide.on .ph.a.vt-sb img{clip-path:none;transform:none}
 ::view-transition-group(sb){animation-duration:.9s;animation-timing-function:cubic-bezier(.77,0,.175,1)}
 ::view-transition-old(sb),::view-transition-new(sb){animation-duration:.9s;height:100%;object-fit:cover}
+
+/* calm mode (user 17.11): text, titles and photos appear with the slide; only the data moments move
+   (donut, lit windows, 240 months, 45-month track, Sosnovyi Bir photo morph) */
+[data-in],.slide.on [data-in]{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}
+h2.rv>span{transform:none!important;transition:none!important}
+.ph,.slide.on .ph{clip-path:none!important;transition:none!important}
+.ph img,.slide.on .ph img,.slide.on .ph:hover img{transform:none!important;transition:none!important}
+#s1 h1 .l span,#s1 .bg img{transform:none!important;transition:none!important}
+#s2 .bar{transform:none!important;transition:none!important}
+#s4 .t>div{opacity:1!important;transform:none!important;transition:none!important}
+#s5 .b i{transform:scaleX(var(--w))!important;transition:none!important}
+#s9 .limit{transform:none!important;transition:none!important}
+#s9 .bld span{opacity:1!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){[data-in],.ph,.ph img,#s1 h1 .l span,h2.rv>span{transform:none!important;filter:none!important;clip-path:none!important}*{transition-delay:0s!important}[data-in]{transition:opacity .3s ease!important}}
 </style>
 </head>
@@ -615,7 +628,7 @@ html[data-pair] .slide.on .vt-sb{view-transition-name:sb}
     const s = slides[cur];
     void s.offsetWidth;
     s.classList.add('on');
-    s.querySelectorAll('[data-count]').forEach(el => count(el, back));
+    s.querySelectorAll('[data-count]').forEach(el => count(el, true));
     if (s.id === 's8') requestAnimationFrame(() => drawDonut(true));
     if (s.id === 's12') playMonths(back);
     if (back) requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('instant')));
@@ -663,7 +676,7 @@ html[data-pair] .slide.on .vt-sb{view-transition-name:sb}
     bg.style.transform = `translate3d(${px.toFixed(2)}px,${py.toFixed(2)}px,0)`;
     raf = Math.abs(gx - px) + Math.abs(gy - py) > .05 ? requestAnimationFrame(drift) : 0;
   }
-  if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  if (false) { // cover parallax switched off (calm mode)
     addEventListener('pointermove', e => {
       if (cur !== 0) return;
       gx = (e.clientX / innerWidth - .5) * -26; gy = (e.clientY / innerHeight - .5) * -16;
