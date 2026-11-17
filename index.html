@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Математика житлового питання</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Palette: ui-ux-pro-max "Luxury/Premium" (ink #1C1917, accent #A16207, stone #FAFAF9, border #D6D3D1) */
+:root{
+  --ink:#1c1917; --ink-2:#44403c; --muted:#78716c; --stone:#fafaf9; --stone-2:#f2f1ef; --line:#d6d3d1;
+  --gold:#a16207; --gold-soft:#f3e7cf; --night:#0f0e0d;
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-io:cubic-bezier(.77,0,.175,1);
+  --display:"Geologica",system-ui,sans-serif; --body:"Onest",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--night);overflow:hidden}
+body{font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased}
+.viewport{position:fixed;inset:0}
+.stage{width:1920px;height:1080px;position:absolute;left:50%;top:50%;transform-origin:center;overflow:hidden;background:var(--stone)}
+.slide{position:absolute;inset:0;padding:96px 120px;opacity:0;visibility:hidden;transition:opacity .2s var(--ease-out),visibility 0s .2s}
+.slide.on{opacity:1;visibility:visible;transition:opacity .45s var(--ease-out),visibility 0s}
+.num{font-family:var(--display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:-.025em;line-height:1.02}
+h2{font-size:72px;max-width:1700px;text-wrap:balance}
+p,li{font-size:30px;line-height:1.5;color:var(--ink-2)}
+.small{font-size:24px;color:var(--muted);line-height:1.45}
+.gold{color:var(--gold)}
+/* entrance: every [data-in] element rises in, staggered by --i */
+[data-in]{opacity:0;transform:translateY(18px);filter:blur(4px);transition:opacity .7s var(--ease-out),transform .8s var(--ease-out),filter .6s var(--ease-out);transition-delay:calc(var(--i,0)*70ms + 120ms)}
+.slide.on [data-in]{opacity:1;transform:none;filter:none}
+.stage.instant *, .stage.instant *:before{transition-duration:0s!important;transition-delay:0s!important}
+[data-in="left"]{transform:translateX(-40px)}
+[data-in="scale"]{transform:scale(.94)}
+/* photos reveal with a clip wipe, then settle from a slight zoom */
+.ph{position:relative;overflow:hidden;background:var(--stone-2)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.12);transition:transform 1.6s var(--ease-out);transition-delay:calc(var(--i,0)*110ms + 150ms)}
+.ph{clip-path:inset(0 0 100% 0);transition:clip-path 1.1s var(--ease-io);transition-delay:calc(var(--i,0)*110ms + 80ms)}
+.slide.on .ph{clip-path:inset(0 0 0 0)}
+.slide.on .ph img{transform:scale(1)}
+.cap{margin-top:18px}
+.cap b{font-family:var(--display);font-weight:600;font-size:30px;color:var(--ink);display:block}
+.cap span{font-size:22px;color:var(--muted)}
+/* progress + hint */
+.progress{position:absolute;left:0;bottom:0;height:4px;background:var(--gold);width:0;transition:width .6s var(--ease-out);z-index:5}
+.hint{position:fixed;right:22px;bottom:16px;font:500 13px var(--body);color:#a8a29e;z-index:9}
+::selection{background:var(--gold-soft);color:var(--ink)}
+.nav-zone{position:absolute;top:0;bottom:0;width:22%;z-index:4;cursor:pointer}
+.nav-zone.l{left:0}.nav-zone.r{right:0}
+/* ---------- 1 cover ---------- */
+#s1{padding:0;background:var(--night);color:#fff}
+#s1 .bg{position:absolute;inset:0}
+#s1 .bg img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);transition:transform 9s var(--ease-out)}
+#s1.on .bg img{transform:scale(1)}
+#s1 .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,14,13,.92) 0%,rgba(15,14,13,.72) 42%,rgba(15,14,13,.05) 78%)}
+#s1 .txt{position:absolute;left:120px;top:0;bottom:0;width:1300px;display:flex;flex-direction:column;justify-content:center}
+#s1 h1{font-size:128px;font-weight:600;color:#fff;line-height:.98}
+#s1 h1 .l{display:block;overflow:hidden;padding-bottom:10px}
+#s1 h1 .l span{display:block;transform:translateY(110%);transition:transform 1.1s var(--ease-out)}
+#s1 h1 .l:nth-child(2) span{transition-delay:.12s}
+#s1.on h1 .l span{transform:none}
+#s1 .lead{margin-top:44px;font-size:30px;color:#e7e5e4;max-width:760px}
+#s1 .grp{margin-top:56px;display:flex;gap:28px;align-items:center;font:500 24px var(--body);color:#d6d3d1}
+#s1 .grp i{display:block;width:72px;height:2px;background:var(--gold)}
+/* ---------- 2 team ---------- */
+#s2 .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:120px;height:100%}
+#s2 .facts{margin-top:44px;display:grid;gap:10px}
+#s2 .facts p{font-size:32px;color:var(--ink)}
+#s2 ul{margin-top:48px;list-style:none;display:grid;gap:18px}
+#s2 li{font-size:27px;padding-left:34px;position:relative}
+#s2 li:before{content:"";position:absolute;left:0;top:19px;width:16px;height:2px;background:var(--gold)}
+#s2 li b{color:var(--ink);font-weight:600}
+#s2 .limit{align-self:center;border-left:2px solid var(--line);padding-left:80px}
+#s2 .big{white-space:nowrap;font-size:168px;font-weight:600;color:var(--gold);line-height:.9}
+#s2 .big small{font-size:64px;margin-left:12px}
+#s2 .limit h3{font-size:44px;margin-top:22px}
+#s2 .bar{margin:48px 0 34px;height:4px;background:var(--gold);transform-origin:left;transform:scaleX(0);transition:transform 1.3s var(--ease-out) .5s}
+#s2.on .bar{transform:none}
+/* ---------- 3 five flats ---------- */
+#s3 .row{margin-top:64px;display:grid;grid-template-columns:repeat(5,1fr);gap:28px}
+#s3 .ph{height:520px}
+#s3 .row > div:nth-child(even) .ph{height:460px;margin-top:60px}
+#s3 .price{font-family:var(--display);font-size:42px;font-weight:600;margin-top:22px}
+#s3 .price small{font-size:22px;color:var(--muted);font-weight:400}
+#s3 .meta{font-size:22px;color:var(--muted);margin-top:6px;line-height:1.4}
+#s3 .src{position:absolute;left:120px;bottom:70px}
+/* ---------- 4 table ---------- */
+#s4 .t{margin-top:56px;display:grid;grid-template-columns:90px 1.4fr 1fr 1fr 1.25fr 1.25fr;font-size:27px}
+#s4 .t > div{padding:24px 0;border-bottom:1px solid var(--line);color:var(--ink-2);opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease-out),transform .7s var(--ease-out);transition-delay:calc(var(--r)*80ms + 200ms)}
+#s4.on .t > div{opacity:1;transform:none}
+#s4 .t .h{font:600 19px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--ink)}
+#s4 .t .hl{color:var(--gold);font-weight:600}
+#s4 .note{margin-top:40px}
+/* ---------- 5 task1 ---------- */
+#s5 .top{display:flex;gap:120px;align-items:flex-end;margin-top:50px}
+#s5 .avg{white-space:nowrap;font-size:170px;font-weight:600;color:var(--gold);line-height:.9}
+#s5 .avg small{font-size:56px}
+#s5 .bars{margin-top:70px;display:grid;gap:18px;max-width:1500px}
+#s5 .b{display:grid;grid-template-columns:120px 1fr 160px;align-items:center;gap:24px;font-size:26px}
+#s5 .b i{display:block;height:34px;background:var(--ink);transform-origin:left;transform:scaleX(0);transition:transform 1.1s var(--ease-out);transition-delay:calc(var(--i)*110ms + 500ms)}
+#s5 .b.best i{background:var(--gold)}
+#s5.on .b i{transform:scaleX(var(--w))}
+#s5 .b span:last-child{font-family:var(--display);font-weight:600}
+#s5 .p{font-size:34px}
+/* ---------- 6 top3 ---------- */
+#s6 .cols{margin-top:60px;display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:40px;align-items:start}
+#s6 .ph{height:440px}
+#s6 .cols>div:not(:first-child) .ph{height:340px}
+#s6 h3{font-size:40px;margin-top:26px}
+#s6 .win h3{color:var(--gold)}
+#s6 .cols p{font-size:24px;margin-top:12px}
+#s6 .no{position:absolute;left:120px;bottom:80px;font-size:26px;color:var(--ink)}
+#s6 .no b{color:var(--gold)}
+/* ---------- 7 chosen ---------- */
+#s7{padding:0;display:grid;grid-template-columns:1080px 1fr;grid-template-rows:1fr 1fr 1fr;background:var(--night)}
+#s7 .ph{height:100%}
+#s7 .a{grid-row:1/4}
+#s7 .info{grid-column:2;grid-row:3;background:var(--night);color:#fff;padding:44px 60px}
+#s7 .info h2{color:#fff;font-size:54px}
+#s7 .info p{color:#d6d3d1;font-size:23px;margin-top:14px;line-height:1.45}
+#s7 .tag{position:absolute;left:44px;bottom:40px;background:rgba(15,14,13,.78);color:#fff;font:500 21px var(--body);padding:14px 20px;backdrop-filter:blur(8px);z-index:2}
+#s7 .tag b{color:#f5d08a;font-weight:600}
+/* ---------- 8 move-in ---------- */
+#s8 .big{white-space:nowrap;font-size:170px;font-weight:600;color:var(--gold);line-height:.9;margin-top:40px}
+#s8 .big small{font-size:56px}
+#s8 .stack{margin-top:60px;display:flex;height:110px;width:1680px}
+#s8 .seg{height:100%;background:var(--ink);border-right:3px solid var(--stone);transform-origin:left;transform:scaleX(0);transition:transform .8s var(--ease-out);transition-delay:calc(var(--i)*160ms + 450ms);position:relative}
+#s8 .seg:nth-child(2){background:var(--ink-2)}#s8 .seg:nth-child(3){background:var(--gold)}#s8 .seg:nth-child(4){background:#78716c}#s8 .seg:nth-child(5){background:#a8a29e}
+#s8.on .seg{transform:none}
+#s8 .labels{display:flex;width:1680px;margin-top:16px}
+#s8 .labels div{font-size:21px;color:var(--muted);line-height:1.3}
+#s8 .labels b{display:block;font-family:var(--display);color:var(--ink);font-size:28px}
+#s8 .after{margin-top:60px;display:grid;grid-template-columns:1fr 1.6fr;gap:80px;align-items:start}
+#s8 .after .num{font-size:66px;font-weight:600}
+/* ---------- 9 monthly ---------- */
+#s9 .wrap{display:grid;grid-template-columns:.85fr 1.15fr;gap:100px;margin-top:50px}
+#s9 .season{display:grid;gap:34px}
+#s9 .season div{border-top:2px solid var(--ink);padding-top:22px}
+#s9 .season .num{font-size:96px;font-weight:600;line-height:1}
+#s9 .season .num small{font-size:36px}
+#s9 .chart{position:relative;height:640px;display:grid;grid-template-columns:repeat(5,1fr);gap:34px;align-items:end;border-bottom:2px solid var(--ink);padding:0 10px}
+#s9 .col{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+#s9 .col i{display:block;width:100%;height:calc(var(--h)*1%);background:var(--line);transform-origin:bottom;transform:scaleY(0);transition:transform 1.1s var(--ease-out);transition-delay:calc(var(--i)*120ms + 500ms)}
+#s9 .col.ok i{background:var(--gold)}
+#s9.on .col i{transform:none}
+#s9 .col span{position:absolute;bottom:calc(var(--h)*1% + 12px);font:600 24px var(--display);opacity:0;transition:opacity .5s;transition-delay:calc(var(--i)*120ms + 1300ms)}
+#s9.on .col span{opacity:1}
+#s9 .col em{position:absolute;bottom:-46px;font:500 22px var(--body);font-style:normal;color:var(--muted)}
+#s9 .limit{position:absolute;z-index:3;left:-20px;right:-20px;bottom:65%;border-top:3px dashed var(--gold);transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--ease-out) .3s}
+#s9.on .limit{transform:none}
+#s9 .limit b{position:absolute;right:0;top:-40px;font:600 24px var(--display);color:var(--gold)}
+#s9 .foot{margin-top:80px}
+/* ---------- 10 buy ---------- */
+#s10 .two{margin-top:60px;display:grid;grid-template-columns:1fr 1fr;gap:60px}
+#s10 .ph{height:470px}
+#s10 h3{font-size:42px;margin-top:28px}
+#s10 .two p{font-size:24px;margin-top:10px}
+#s10 .two .num{font-size:52px;font-weight:600;color:var(--gold);margin-top:16px}
+/* ---------- 11 credit ---------- */
+#s11 .formula{margin-top:34px;font:500 38px var(--display);color:var(--ink)}
+#s11 .formula span{color:var(--muted);font-size:28px;margin-left:40px}
+#s11 .cmp{margin-top:56px;display:grid;grid-template-columns:1fr 1fr;gap:80px}
+#s11 .cmp>div{border-top:2px solid var(--ink);padding-top:28px}
+#s11 .cmp h3{font-size:36px}
+#s11 dl{margin-top:22px;display:grid;grid-template-columns:1fr auto;row-gap:14px;font-size:27px}
+#s11 dt{color:var(--muted)}#s11 dd{font-family:var(--display);font-weight:600;text-align:right}
+#s11 .pay{margin-top:26px;font-size:96px;font-weight:600;color:var(--gold);line-height:1}
+#s11 .pay small{font-size:34px}
+#s11 .pay-note{font-size:24px;color:var(--muted);margin-top:8px}
+/* ---------- 12 overpay: 240 months ---------- */
+#s12{background:var(--night);color:#fff}
+#s12 h2{color:#fff}
+#s12 .wrap{display:grid;grid-template-columns:1fr 760px;gap:110px;margin-top:56px}
+#s12 .months{display:grid;grid-template-columns:repeat(24,1fr);gap:7px}
+#s12 .m{aspect-ratio:1;background:#292524;transition:background .25s}
+#s12 .m.k{background:#57534e}
+#s12 .m.o{background:var(--gold)}
+#s12 .legend{margin-top:30px;display:flex;gap:44px;font-size:22px;color:#d6d3d1}
+#s12 .legend i{display:inline-block;width:18px;height:18px;margin-right:12px;vertical-align:-2px}
+#s12 .side .num{font-size:104px;font-weight:600;color:#f5d08a;line-height:1}
+#s12 .side .num small{font-size:38px}
+#s12 .side p{color:#d6d3d1;font-size:26px;margin-top:14px}
+#s12 .side .second{margin-top:56px;padding-top:34px;border-top:1px solid #44403c}
+#s12 .side .second .num{font-size:72px;color:#fff}
+/* ---------- 13 conclusion ---------- */
+#s13{padding:0;display:grid;grid-template-columns:1fr 760px}
+#s13 .l{padding:96px 120px}
+#s13 .word{font-size:230px;font-weight:600;color:var(--gold);line-height:.85;letter-spacing:-.04em}
+#s13 .sub{font:600 44px var(--display);margin-top:34px;line-height:1.15}
+#s13 ol{margin-top:56px;list-style:none;display:grid;gap:22px;counter-reset:r}
+#s13 li{font-size:27px;padding-left:64px;position:relative;counter-increment:r}
+#s13 li:before{content:counter(r);position:absolute;left:0;top:-4px;font:600 40px var(--display);color:var(--gold)}
+#s13 .plan{position:relative;background:var(--night);color:#fff;padding:96px 72px;display:flex;flex-direction:column;justify-content:flex-end}
+#s13 .plan .ph{position:absolute;inset:0;opacity:.5}
+#s13 .plan > *:not(.ph){position:relative}
+#s13 .plan .num{font-size:150px;font-weight:600;color:#f5d08a;line-height:.9}
+#s13 .plan .num small{font-size:46px}
+#s13 .plan p{color:#e7e5e4;font-size:26px;margin-top:20px}
+#s13 .track{margin-top:40px;height:6px;background:rgba(255,255,255,.18)}
+#s13 .track i{display:block;height:100%;width:100%;background:#f5d08a;transform-origin:left;transform:scaleX(0);transition:transform 2.4s var(--ease-io) .7s}
+#s13.on .track i{transform:scaleX(1)}
+/* ---------- 14 defense ---------- */
+#s14 .qa{margin-top:60px;display:grid;grid-template-columns:1fr 1fr;gap:56px 90px}
+#s14 .qa div{border-top:2px solid var(--ink);padding-top:26px}
+#s14 h3{font-size:40px}
+#s14 .qa p{margin-top:14px;font-size:27px}
+/* ---------- 15 end ---------- */
+#s15{background:var(--night);color:#fff;padding:0}
+#s15 .bg{position:absolute;inset:0;opacity:.35}
+#s15 .bg img{width:100%;height:100%;object-fit:cover}
+#s15 .in{position:relative;height:100%;display:grid;grid-template-columns:1fr 1fr;gap:120px;padding:96px 120px;align-items:end}
+#s15 .thanks{font-size:210px;font-weight:600;line-height:.85;color:#fff}
+#s15 .src{font-size:23px;color:#d6d3d1;line-height:1.6}
+#s15 .src b{color:#fff;font-weight:600}
+@media (prefers-reduced-motion:reduce){[data-in],.ph,.ph img,#s1 h1 .l span{transform:none!important;filter:none!important;clip-path:none!important}*{transition-delay:0s!important}[data-in]{transition:opacity .3s ease!important}}
+</style>
+</head>
+<body>
+<div class="viewport"><div class="stage" id="stage">
+
+<!-- 1 -->
+<section class="slide" id="s1">
+  <div class="bg"><img src="img/cover.jpg" alt="Нічний Київ над Дніпром"></div>
+  <div class="shade"></div>
+  <div class="txt">
+    <h1><span class="l"><span>Математика</span></span><span class="l"><span>житлового питання</span></span></h1>
+    <p class="lead" data-in style="--i:4">Двоє IT-спеціалістів шукають житло в Києві. Ми порівняли п'ять квартир в оренду і дві на продаж і порахували, що вигідніше.</p>
+    <div class="grp" data-in style="--i:6"><i></i>Група 3 «Кар'єрний старт»</div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" id="s2">
+  <div class="grid">
+    <div>
+      <h2 data-in>Хто ми і скільки можемо платити</h2>
+      <div class="facts">
+        <p data-in style="--i:1">Двоє IT-спеціалістів, працюємо дистанційно.</p>
+        <p data-in style="--i:2">Дохід: 35 000 + 30 000 = <b class="num">65 000 грн</b> на місяць.</p>
+        <p data-in style="--i:3">Заощадження: <b class="num">120 000 грн</b>.</p>
+      </div>
+      <ul>
+        <li data-in style="--i:4"><b>Дві кімнати.</b> Працюємо вдома, кожному потрібне робоче місце.</li>
+        <li data-in style="--i:5"><b>Парк або ліс поруч.</b> Щоб відпочивати після роботи.</li>
+        <li data-in style="--i:6"><b>Швидкісний інтернет.</b> Від нього залежить наша робота.</li>
+        <li data-in style="--i:7"><b>Генератор у будинку.</b> Щоб працювати під час відключень.</li>
+      </ul>
+    </div>
+    <div class="limit">
+      <div class="big num" data-count="19500" data-in="scale" style="--i:2">19 500<small>грн</small></div>
+      <h3 data-in style="--i:3">максимум на житло щомісяця</h3>
+      <div class="bar"></div>
+      <p class="small" data-in style="--i:6">Це 30% доходу. Фінансисти радять віддавати на житло не більше третини, решта йде на їжу, транспорт і заощадження. Цією лінією ми міряємо кожну квартиру.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" id="s3">
+  <h2 data-in>П'ять квартир в оренду</h2>
+  <div class="row">
+    <div><div class="ph" style="--i:1"><img src="img/n1-dining.jpg" alt="Квартира 1"></div><div class="price" data-in style="--i:2">18 000 <small>грн</small></div><div class="meta" data-in style="--i:3">№1 ЖК «Академ-Квартал»<br>61 м², Академмістечко</div></div>
+    <div><div class="ph" style="--i:2"><img src="img/n2-living.jpg" alt="Квартира 2"></div><div class="price" data-in style="--i:3">25 000 <small>грн</small></div><div class="meta" data-in style="--i:4">№2 ЖК «4U»<br>63 м², Новобіличі</div></div>
+    <div><div class="ph" style="--i:3"><img src="img/n3-living.jpg" alt="Квартира 3"></div><div class="price gold" data-in style="--i:4">14 000 <small>грн</small></div><div class="meta" data-in style="--i:5">№3 ЖК «Сосновий бір»<br>45 м², Новобіличі</div></div>
+    <div><div class="ph" style="--i:4"><img src="img/n4-living.jpg" alt="Квартира 4"></div><div class="price" data-in style="--i:5">17 000 <small>грн</small></div><div class="meta" data-in style="--i:6">№4 пров. Моторний, 11<br>60 м², Голосіївський</div></div>
+    <div><div class="ph" style="--i:5"><img src="img/n5-living.jpg" alt="Квартира 5"></div><div class="price" data-in style="--i:6">23 000 <small>грн</small></div><div class="meta" data-in style="--i:7">№5 Голосіївський просп., 122<br>50 м², біля ВДНГ</div></div>
+  </div>
+  <p class="small src" data-in style="--i:8">Оголошення з ЛУН, Flatfy, OLX і rieltor.ua. Усі п'ять перевірені 17.11.2026: вони ще на сайтах.</p>
+</section>
+
+<!-- 4 -->
+<section class="slide" id="s4">
+  <h2 data-in>Порівнюємо характеристики</h2>
+  <div class="t">
+    <div class="h" style="--r:0">№</div><div class="h" style="--r:0">Автономність</div><div class="h" style="--r:0">Поверх</div><div class="h" style="--r:0">Рієлтор</div><div class="h" style="--r:0">Що поруч</div><div class="h" style="--r:0">Стан</div>
+    <div style="--r:1">1</div><div style="--r:1">генератор</div><div style="--r:1">20 з 25</div><div style="--r:1">без комісії</div><div style="--r:1">450 м до метро</div><div style="--r:1">євроремонт, 2023</div>
+    <div style="--r:2">2</div><div style="--r:2">генератор</div><div style="--r:2">26 з 27</div><div style="--r:2">без комісії</div><div style="--r:2">парк, 15 хв</div><div style="--r:2">ремонт, 2024</div>
+    <div class="hl" style="--r:3">3</div><div class="hl" style="--r:3">сонячні панелі</div><div class="hl" style="--r:3">30 з 33</div><div class="hl" style="--r:3">7 000 грн</div><div class="hl" style="--r:3">ліс біля будинку</div><div class="hl" style="--r:3">євроремонт, 2013</div>
+    <div style="--r:4">4</div><div style="--r:4">генератор</div><div style="--r:4">17 з 25</div><div style="--r:4">8 500 грн</div><div style="--r:4">новий будинок</div><div style="--r:4">євроремонт, 2019</div>
+    <div style="--r:5">5</div><div style="--r:5">без генератора</div><div style="--r:5">8 з 9</div><div style="--r:5">11 500 грн</div><div style="--r:5">парк, метро</div><div style="--r:5">євроремонт, цегла</div>
+  </div>
+  <p class="small note" data-in style="--i:7">Застава в усіх дорівнює місячній оренді. Комунальні з інтернетом: 1 550 грн влітку і 3 750 грн взимку. Рієлтору платимо 50% оренди, якщо в оголошенні не написано «без комісії».</p>
+</section>
+
+<!-- 5 -->
+<section class="slide" id="s5">
+  <h2 data-in>Завдання 1. Аналіз вибірки</h2>
+  <div class="top">
+    <div><div class="avg num" data-count="19400" data-in="scale" style="--i:1">19 400<small> грн</small></div><p class="small" data-in style="--i:2">середня оренда: 97 000 / 5</p></div>
+    <div><p class="p" data-in style="--i:3">Найдешевша <b class="gold">14 000</b> (№3), найдорожча <b>25 000</b> (№2).</p><p class="p" data-in style="--i:4">p = (25 000 − 14 000) / 14 000 · 100% ≈ <b class="gold">78,6%</b></p></div>
+  </div>
+  <div class="bars">
+    <p class="small" data-in style="--i:4">Ціна 1 м² за формулою C = R / S</p>
+    <div class="b best" style="--i:0;--w:.615"><span>№4</span><i></i><span>283 грн</span></div>
+    <div class="b" style="--i:1;--w:.641"><span>№1</span><i></i><span>295 грн</span></div>
+    <div class="b" style="--i:2;--w:.676"><span>№3</span><i></i><span>311 грн</span></div>
+    <div class="b" style="--i:3;--w:.863"><span>№2</span><i></i><span>397 грн</span></div>
+    <div class="b" style="--i:4;--w:1"><span>№5</span><i></i><span>460 грн</span></div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" id="s6">
+  <h2 data-in>Три найкращі пропозиції</h2>
+  <div class="cols">
+    <div class="win"><div class="ph" style="--i:1"><img src="img/n3-living2.jpg" alt=""></div><h3 data-in style="--i:2">№3 «Сосновий бір»</h3><p data-in style="--i:3">Найдешевша оренда, ліс біля будинку, сонячні панелі. Єдина, що вкладається в бюджет навіть узимку.</p></div>
+    <div><div class="ph" style="--i:2"><img src="img/n1-bed.jpg" alt=""></div><h3 data-in style="--i:3">№1 «Академ-Квартал»</h3><p data-in style="--i:4">450 м до метро, генератор, без комісії. Але взимку 21 750 грн, це більше за ліміт.</p></div>
+    <div><div class="ph" style="--i:3"><img src="img/n4-kitchen.jpg" alt=""></div><h3 data-in style="--i:4">№4 Моторний, 11</h3><p data-in style="--i:5">Новий будинок і генератор. Але взимку 20 750 грн, і ще комісія рієлтору.</p></div>
+  </div>
+  <p class="no" data-in style="--i:7"><b>№2 і №5 відкинули:</b> сама оренда 23 000 і 25 000 грн уже більша за 19 500.</p>
+</section>
+
+<!-- 7 -->
+<section class="slide" id="s7">
+  <div class="ph a" style="--i:0"><img src="img/n3-living.jpg" alt="Вітальня в ЖК Сосновий бір"><div class="tag"><b>14 000 грн</b> на місяць</div></div>
+  <div class="ph" style="--i:1"><img src="img/n3-kitchen.jpg" alt="Кухня"></div>
+  <div class="ph" style="--i:2"><img src="img/sb-forest.jpg" alt="Сосновий ліс у дворі"></div>
+  <div class="info">
+    <h2 data-in style="--i:3">Наш вибір: ЖК «Сосновий бір»</h2>
+    <p data-in style="--i:4">Вул. Олевська, 9. Дві кімнати, 45 м², 30 поверх з 33. Сосновий ліс у дворі. Сонячні панелі й резервне живлення тримають ліфти й воду під час блекаутів.</p>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" id="s8">
+  <h2 data-in>Завдання 2-3. Скільки коштує заселитися</h2>
+  <div class="big num" data-count="38500" data-in="scale" style="--i:1">38 500<small> грн</small></div>
+  <div class="stack">
+    <div class="seg" style="--i:0;width:36.36%"></div><div class="seg" style="--i:1;width:36.36%"></div><div class="seg" style="--i:2;width:18.18%"></div><div class="seg" style="--i:3;width:7.79%"></div><div class="seg" style="--i:4;width:1.31%"></div>
+  </div>
+  <div class="labels">
+    <div style="width:36.36%"><b>14 000</b>перший місяць</div><div style="width:36.36%"><b>14 000</b>застава</div><div style="width:18.18%"><b>7 000</b>рієлтор</div><div style="width:9.1%"><b>3 500</b>переїзд та інтернет</div>
+  </div>
+  <div class="after">
+    <div data-in style="--i:6"><div class="num">81 500 грн</div><p class="small">лишається з 120 000. Витрачено 32,1% заощаджень.</p></div>
+    <p data-in style="--i:7">Мало заплатити лише за перший місяць. Власник бере заставу, її повернуть, коли з'їдемо. Рієлтору платимо половину оренди. Залишок 81 500 грн лишаємо на непередбачені витрати.</p>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" id="s9">
+  <h2 data-in>Завдання 4. Скільки коштує жити щомісяця</h2>
+  <div class="wrap">
+    <div class="season">
+      <div data-in style="--i:1"><p class="small">Літо: оренда + комунальні</p><div class="num">15 550<small> грн</small></div><p class="small">23,9% доходу</p></div>
+      <div data-in style="--i:2"><p class="small">Зима: додається опалення 2 000 грн</p><div class="num gold">17 750<small> грн</small></div><p class="small">27,3% доходу. За рік 199 800 грн, у середньому 16 650 на місяць.</p></div>
+    </div>
+    <div>
+      <div class="chart">
+        <div class="limit"><b>межа 19 500</b></div>
+        <div class="col ok" style="--i:0;--h:59.2"><span>17 750</span><i></i><em>№3</em></div>
+        <div class="col" style="--i:1;--h:69.2"><span>20 750</span><i></i><em>№4</em></div>
+        <div class="col" style="--i:2;--h:72.5"><span>21 750</span><i></i><em>№1</em></div>
+        <div class="col" style="--i:3;--h:89.2"><span>26 750</span><i></i><em>№5</em></div>
+        <div class="col" style="--i:4;--h:95.8"><span>28 750</span><i></i><em>№2</em></div>
+      </div>
+      <p class="small foot" data-in style="--i:6">Взимку з комунальними. Під лінією 30% лишається тільки №3.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" id="s10">
+  <h2 data-in>Завдання 5. А може, краще купити?</h2>
+  <div class="two">
+    <div><div class="ph" style="--i:1"><img src="img/s1-bed.jpg" alt=""></div><h3 data-in style="--i:2">ЖК «Грюнвальд», Клавдіївська, 40-В</h3><p data-in style="--i:3">65 м², 2 кімнати, з ремонтом, будинок 2014 року. 65 540 грн за м².</p><div class="num" data-in style="--i:4">$94 000 ≈ 4 260 080 грн</div></div>
+    <div><div class="ph" style="--i:2"><img src="img/s2-kitchen.jpg" alt=""></div><h3 data-in style="--i:3">Вул. Українського Відродження, 3-А</h3><p data-in style="--i:4">60 м², 2 кімнати, ремонт і меблі, будинок 2008 року. 51 363 грн за м².</p><div class="num" data-in style="--i:5">$68 000 ≈ 3 081 760 грн</div></div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide" id="s11">
+  <h2 data-in>Завдання 6. Кредит</h2>
+  <div class="formula" data-in style="--i:1">M = K · i(1+i)ⁿ / ((1+i)ⁿ − 1) <span>i = 12% / 12 = 1%, n = 240 місяців</span></div>
+  <div class="cmp">
+    <div data-in style="--i:2"><h3>Квартира 1, «Грюнвальд»</h3>
+      <dl><dt>Перший внесок 30%</dt><dd>1 278 024</dd><dt>Кредит K</dt><dd>2 982 056</dd><dt>Оформлення 2%</dt><dd>85 202</dd><dt>Бракує одразу</dt><dd class="gold">1 243 226</dd></dl>
+      <div class="pay num" data-count="32835">32 835<small> грн / міс</small></div><p class="pay-note">50,5% доходу, у 2,35 раза більше за оренду</p></div>
+    <div data-in style="--i:3"><h3>Квартира 2, Укр. Відродження</h3>
+      <dl><dt>Перший внесок 30%</dt><dd>924 528</dd><dt>Кредит K</dt><dd>2 157 232</dd><dt>Оформлення 2%</dt><dd>61 635</dd><dt>Бракує одразу</dt><dd class="gold">866 163</dd></dl>
+      <div class="pay num" data-count="23753">23 753<small> грн / міс</small></div><p class="pay-note">36,5% доходу, у 1,7 раза більше за оренду</p></div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide" id="s12">
+  <h2 data-in>20 років платежів</h2>
+  <div class="wrap">
+    <div data-in style="--i:1">
+      <div class="months" id="months"></div>
+      <div class="legend"><span><i style="background:#57534e"></i>повертаємо кредит</span><span><i style="background:var(--gold)"></i>переплата банку</span></div>
+    </div>
+    <div class="side">
+      <div data-in style="--i:2"><div class="num" data-count="3543484">3 543 484<small> грн</small></div><p>переплата за дешевшу квартиру. Це більше, ніж коштує сама квартира (3 081 760).</p></div>
+      <div class="second" data-in style="--i:4"><div class="num">6 686 879 грн</div><p>повна ціна квартири з кредитом. За дорожчу: 9 243 627 грн.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide" id="s13">
+  <div class="l">
+    <div class="word" data-in style="--i:0">Оренда.</div>
+    <div class="sub" data-in style="--i:1">Заселяємося в «Сосновий бір»<br>і відкладаємо 20 000 грн на місяць.</div>
+    <ol>
+      <li data-in style="--i:3">На внесок і оформлення треба мінімум 986 163 грн, а в нас 120 000.</li>
+      <li data-in style="--i:4">Платіж за кредитом від 23 753 грн, це більше за наш ліміт 19 500.</li>
+      <li data-in style="--i:5">За 20 років банк забере 3,5-4,9 млн переплати.</li>
+    </ol>
+  </div>
+  <div class="plan">
+    <div class="ph" style="--i:1"><img src="img/n3-view.jpg" alt=""></div>
+    <div class="num" data-count="45">45<small> місяців</small></div>
+    <p>(986 163 − 81 500) / 20 000 ≈ 45 місяців, тобто приблизно 3,8 року до власного першого внеску, якщо ціни не зміняться.</p>
+    <div class="track"><i></i></div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide" id="s14">
+  <h2 data-in>Відповіді для захисту</h2>
+  <div class="qa">
+    <div data-in style="--i:1"><h3>Яку квартиру обрали?</h3><p>«Сосновий бір», 14 000 грн. Виконує всі чотири вимоги і вкладається в 30% навіть узимку.</p></div>
+    <div data-in style="--i:2"><h3>Скільки на заселення?</h3><p>38 500 грн: місяць, застава, рієлтор, переїзд, інтернет. Лишається 81 500 грн.</p></div>
+    <div data-in style="--i:3"><h3>Скільки щомісяця?</h3><p>15 550 грн влітку і 17 750 грн узимку, тобто 23,9-27,3% доходу.</p></div>
+    <div data-in style="--i:4"><h3>Чому оренда, а не кредит?</h3><p>Бракує щонайменше 866 163 грн на внесок, платіж від 23 753 грн, переплата понад 3,5 млн.</p></div>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="slide" id="s15">
+  <div class="bg"><img src="img/cover.jpg" alt=""></div>
+  <div class="in">
+    <div class="thanks" data-in>Дякуємо!</div>
+    <div class="src" data-in style="--i:2"><b>Джерела</b><br>Оголошення: ЛУН, Flatfy, OLX, rieltor.ua (зібрані 15.11, перевірені 17.11.2026).<br>Курс НБУ на 12.11.2026: 45,3222 грн за долар.<br>Фото квартир: з оголошень. Нічний Київ: Unsplash.<br><br><b>Група 3 «Кар'єрний старт»</b></div>
+  </div>
+</section>
+
+<div class="nav-zone l" id="prev"></div><div class="nav-zone r" id="next"></div>
+<div class="progress" id="progress"></div>
+</div></div>
+<div class="hint">← → або клік</div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let cur = -1;
+
+  function fit() {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = `translate(-50%,-50%) scale(${s})`;
+  }
+  addEventListener('resize', fit); fit();
+
+  // 240-month grid: first months repay the loan, the rest of the money is the bank's
+  const months = document.getElementById('months');
+  const cells = [];
+  for (let i = 0; i < 240; i++) { const c = document.createElement('div'); c.className = 'm'; months.appendChild(c); cells.push(c); }
+  // cheaper flat: total 5 700 716, principal 2 157 232 -> 37.8% of payments repay the loan
+  const loanShare = Math.round(240 * 2157232 / 5700716);
+  let monthTimer = null;
+  function playMonths() {
+    clearInterval(monthTimer);
+    cells.forEach(c => c.className = 'm');
+    if (reduce) { cells.forEach((c, i) => c.className = 'm ' + (i < loanShare ? 'k' : 'o')); return; }
+    let i = 0;
+    setTimeout(() => {
+      monthTimer = setInterval(() => {
+        for (let k = 0; k < 4 && i < 240; k++, i++) cells[i].className = 'm ' + (i < loanShare ? 'k' : 'o');
+        if (i >= 240) clearInterval(monthTimer);
+      }, 22);
+    }, 500);
+  }
+
+  // count-up for big numbers, keeps the inner <small> unit
+  const fmt = n => Math.round(n).toLocaleString('uk-UA').replace(/ |,/g, ' ');
+  function count(el) {
+    const target = +el.dataset.count;
+    const unit = el.querySelector('small');
+    const unitHTML = unit ? unit.outerHTML : '';
+    if (reduce) { el.innerHTML = fmt(target) + unitHTML; return; }
+    const t0 = performance.now(), dur = 1400;
+    const ease = t => 1 - Math.pow(1 - t, 4);
+    (function step(now) {
+      const t = Math.min(1, (now - t0 - 250) / dur);
+      el.innerHTML = fmt(target * ease(Math.max(0, t))) + unitHTML;
+      if (t < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  function go(n) {
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    if (n === cur) return;
+    const back = n < cur;
+    stage.classList.toggle('instant', back);
+    if (cur >= 0) slides[cur].classList.remove('on');
+    cur = n;
+    const s = slides[cur];
+    void s.offsetWidth;
+    s.classList.add('on');
+    if (back) s.querySelectorAll('[data-count]').forEach(el => { const u = el.querySelector('small'); el.innerHTML = fmt(+el.dataset.count) + (u ? u.outerHTML : ''); });
+    else s.querySelectorAll('[data-count]').forEach(count);
+    if (back) requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('instant')));
+    if (s.id === 's12') playMonths();
+    document.getElementById('progress').style.width = ((cur + 1) / slides.length * 100) + '%';
+    history.replaceState(null, '', '#' + (cur + 1));
+  }
+
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+    if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End') go(slides.length - 1);
+    if (e.key === 'f') document.documentElement.requestFullscreen?.();
+  });
+  document.getElementById('next').onclick = () => go(cur + 1);
+  document.getElementById('prev').onclick = () => go(cur - 1);
+  let tx = null;
+  addEventListener('touchstart', e => tx = e.touches[0].clientX, { passive: true });
+  addEventListener('touchend', e => { if (tx === null) return; const d = e.changedTouches[0].clientX - tx; if (Math.abs(d) > 50) go(cur + (d < 0 ? 1 : -1)); tx = null; });
+
+  const start = parseInt(location.hash.slice(1)) || 1;
+  go(start - 1);
+})();
+</script>
+</body>
+</html>
